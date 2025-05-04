@@ -1,0 +1,232 @@
+Exp No.1:
+
+a.)
+from matplotlib import pyplot as plt
+import cv2
+
+img_color = cv2.imread('/lavender.jpg',1)
+img_grayscale = cv2.imread('/lavender.jpg',0)
+img_unchanged = cv2.imread('/lavender.jpg',-1)
+
+plt.imshow(img_color)
+plt.show()
+plt.imshow(cv2.cvtColor(img_color, cv2.COLOR_BGR2RGB))
+plt.show()
+plt.imshow(cv2.cvtColor(img_grayscale, cv2.COLOR_BGR2RGB))
+plt.show()
+
+b.)
+import cv2
+#from google.colab.patches import cv2_imshow
+image_path = '/lavender.jpg'
+image = cv2.imread(image_path)
+print("Original Image:")
+cv2_imshow(image)
+# Resize the image to a specific size (e.g., 300x300 pixels)
+resized_image_fixed = cv2.resize(image, (300, 300), interpolation=cv2.INTER_LINEAR)
+print("Resized Image (300x300):")
+cv2_imshow(resized_image_fixed)
+# Resize the image by scale factors (e.g., half the size)
+resized_image_scaled = cv2.resize(image, None, fx=0.5, fy=0.5, interpolation=cv2.INTER_AREA)
+print("Resized Image (50% of original size):")
+cv2_imshow(resized_image_scaled)
+
+c.)
+import cv2
+#from google.colab.patches import cv2_imshow
+
+image_path = '/lavender.jpg'
+image = cv2.imread(image_path)
+
+print("Original Image")
+cv2_imshow(image)
+
+# Check if image loaded successfully
+if image is None:
+    print(f"Error: Could not load image from {file_name}. Please check the file.")
+else:
+    # Rotate the image 90 degrees clockwise
+    rotated_90_cw = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
+    print("Image Rotated 90 Degrees Clockwise:")
+    cv2_imshow(rotated_90_cw)
+
+    # Rotate the image 90 degrees counterclockwise
+    rotated_90_ccw = cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE)
+    print("Image Rotated 90 Degrees Counterclockwise:")
+    cv2_imshow(rotated_90_ccw)
+
+    # Rotate the image 180 degrees
+    rotated_180 = cv2.rotate(image, cv2.ROTATE_180)
+    print("Image Rotated 180 Degrees:")
+    cv2_imshow(rotated_180)
+
+// w/o inbuilt function
+
+import cv2
+import numpy as np
+from google.colab.patches import cv2_imshow  # For Colab display
+
+image_path = '/lavender.jpg'
+image = cv2.imread(image_path)
+
+print("Original Image:")
+cv2_imshow(image)
+
+# Check if image loaded successfully
+if image is None:
+    print(f"Error: Could not load image from {image_path}. Please check the file.")
+else:
+    # 90 degrees clockwise: Transpose + Horizontal Flip
+    rotated_90_cw = np.transpose(image, (1, 0, 2))[:, ::-1, :]
+
+    # 90 degrees counterclockwise: Transpose + Vertical Flip
+    rotated_90_ccw = np.transpose(image, (1, 0, 2))[::-1, :, :]
+
+    # 180 degrees: Flip both axes
+    rotated_180 = image[::-1, ::-1, :]
+
+    print("Image Rotated 90 Degrees Clockwise:")
+    cv2_imshow(rotated_90_cw)
+
+    print("Image Rotated 90 Degrees Counterclockwise:")
+    cv2_imshow(rotated_90_ccw)
+
+    print("Image Rotated 180 Degrees:")
+    cv2_imshow(rotated_180)
+
+d.)
+import cv2
+from google.colab.patches import cv2_imshow
+from google.colab import files
+print("Please upload the two images.")
+uploaded = files.upload()
+if len(uploaded) < 2:
+  print("Please upload exactly two images to proceed!")
+else:
+  image_names = list(uploaded.keys())
+  img1 = cv2.imread(image_names[0])
+  img2 = cv2.imread(image_names[1])
+if img1 is None or img2 is None:
+  print("One or both images could not be loaded. Please check the file formats.")
+else:
+  # Step : Resize both images to the same dimensions
+  height, width = 300, 300 # Desired size for resizing
+  img1_resized = cv2.resize(img1, (width, height))
+  img2_resized = cv2.resize(img2, (width, height))
+  print("First Image (Resized):")
+  cv2_imshow(img1_resized)
+  print("Second Image (Resized):")
+  cv2_imshow(img2_resized)
+  # Step: Add the two images
+  added_image = cv2.add(img1_resized, img2_resized)
+  print("Added Image:")
+  cv2_imshow(added_image)
+
+e.)
+import cv2
+from google.colab.patches import cv2_imshow
+import numpy as np
+import matplotlib.pyplot as plt
+from google.colab import files
+uploaded = files.upload()
+image_name = list(uploaded.keys())[0]
+image = cv2.imread(image_name)
+print("Original Image:")
+cv2_imshow(image)
+channels = ['Blue', 'Green', 'Red']
+colors = ['b', 'g', 'r']
+plt.figure(figsize=(10, 5))
+for i, color in enumerate(colors):
+  # Calculate histogram for each channel
+  hist = cv2.calcHist([image], [i], None, [256], [0, 256])
+  plt.plot(hist, color=color, label=f"{channels[i]} Channel")
+# Customize the plot
+plt.title("RGB Histogram")
+plt.xlabel("Pixel Intensity")
+plt.ylabel("Frequency")
+plt.legend()
+plt.grid()
+plt.show()
+
+// w/o inbuilt function
+
+import cv2
+from google.colab.patches import cv2_imshow
+import numpy as np
+import matplotlib.pyplot as plt
+from google.colab import files
+
+# Upload and read image
+uploaded = files.upload()
+image_name = list(uploaded.keys())[0]
+image = cv2.imread(image_name)
+
+# Display original image
+print("Original Image:")
+cv2_imshow(image)
+
+# Define channel names and plot colors
+channels = ['Blue', 'Green', 'Red']
+colors = ['b', 'g', 'r']
+
+plt.figure(figsize=(10, 5))
+
+# Loop over each channel
+for i, color in enumerate(colors):
+    # Extract the channel
+    channel_data = image[:, :, i].flatten()
+
+    # Manually calculate histogram
+    hist = np.zeros(256, dtype=int)
+    for pixel_value in channel_data:
+        hist[pixel_value] += 1
+
+    # Plot histogram
+    plt.plot(hist, color=color, label=f"{channels[i]} Channel")
+
+# Customize the plot
+plt.title("RGB Histogram (Manual Calculation)")
+plt.xlabel("Pixel Intensity")
+plt.ylabel("Frequency")
+plt.legend()
+plt.grid()
+plt.show()
+
+f.)
+import cv2
+from google.colab.patches import cv2_imshow
+from google.colab import files
+uploaded = files.upload()
+# Load the image in grayscale
+image_name = list(uploaded.keys())[0]
+image = cv2.imread(image_name, cv2.IMREAD_GRAYSCALE)
+# Apply simple thresholding
+threshold_value = 127
+max_value = 255
+_, binary_thresh = cv2.threshold(image, threshold_value, max_value, cv2.THRESH_BINARY)
+print("Original Image:")
+cv2_imshow(image)
+print("Thresholded Image (Binary):")
+cv2_imshow(binary_thresh)
+
+g.)
+import cv2
+import numpy as np
+from google.colab.patches import cv2_imshow
+from google.colab import files
+uploaded = files.upload()
+image_name = list(uploaded.keys())[0]
+image = cv2.imread(image_name)
+gray_image = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
+# Add noise to the image using cv2.randn
+mean = 0
+stddev = 50
+noise = np.zeros_like(gray_image, dtype=np.int16) # Create a noise array
+cv2.randn(noise, mean, stddev) # Fill the noise array with random values
+# Add noise to the image
+noisy_image = cv2.add(gray_image, noise, dtype=cv2.CV_8U) # Add noise (clip to valid range)
+print("Original Grayscale Image:")
+cv2_imshow(gray_image)
+print("Noisy Image:")
+cv2_imshow(noisy_image)
+	

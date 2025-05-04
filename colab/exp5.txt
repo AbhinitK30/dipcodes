@@ -1,0 +1,266 @@
+Exp No.5:
+
+a.)
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+from google.colab import files
+# Upload an image
+print("Upload an image")
+uploaded = files.upload()
+# Read the uploaded image in grayscale
+image_name = list(uploaded.keys())[0]
+image = cv2.imread(image_name, cv2.IMREAD_GRAYSCALE)
+# Apply Box Filter (Mean Filter) with 3×3 and 7×7 kernels
+box_3x3 = cv2.blur(image, (3, 3))
+box_7x7 = cv2.blur(image, (7, 7))
+# Display the original and filtered images
+plt.figure(figsize=(15, 5))
+plt.subplot(1, 3, 1)
+plt.imshow(image, cmap='gray')
+plt.title("Original Image")
+plt.xlabel("Width")
+plt.ylabel("Height")
+plt.subplot(1, 3, 2)
+plt.imshow(box_3x3, cmap='gray')
+plt.title("Box Filter (3×3)")
+plt.xlabel("Width")
+plt.ylabel("Height")
+plt.subplot(1, 3, 3)
+plt.imshow(box_7x7, cmap='gray')
+plt.title("Box Filter (7×7)")
+plt.xlabel("Width")
+plt.ylabel("Height")
+plt.tight_layout()
+plt.show()
+
+// w/o inbuilt function
+
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+from google.colab import files
+
+# Upload an image
+print("Upload an image")
+uploaded = files.upload()
+
+# Read the uploaded image in grayscale
+image_name = list(uploaded.keys())[0]
+image = cv2.imread(image_name, cv2.IMREAD_GRAYSCALE)
+
+# Manual box filter function
+def apply_box_filter(img, ksize):
+    pad = ksize // 2
+    padded_img = np.pad(img, ((pad, pad), (pad, pad)), mode='constant', constant_values=0)
+    filtered_img = np.zeros_like(img)
+
+    for i in range(img.shape[0]):
+        for j in range(img.shape[1]):
+            roi = padded_img[i:i+ksize, j:j+ksize]
+            filtered_img[i, j] = np.mean(roi)
+
+    return filtered_img
+
+# Apply manual box filters
+box_3x3 = apply_box_filter(image, 3)
+box_7x7 = apply_box_filter(image, 7)
+
+# Display the original and filtered images
+plt.figure(figsize=(15, 5))
+
+plt.subplot(1, 3, 1)
+plt.imshow(image, cmap='gray')
+plt.title("Original Image")
+plt.xlabel("Width")
+plt.ylabel("Height")
+
+plt.subplot(1, 3, 2)
+plt.imshow(box_3x3, cmap='gray')
+plt.title("Box Filter (3×3) - Manual")
+plt.xlabel("Width")
+plt.ylabel("Height")
+
+plt.subplot(1, 3, 3)
+plt.imshow(box_7x7, cmap='gray')
+plt.title("Box Filter (7×7) - Manual")
+plt.xlabel("Width")
+plt.ylabel("Height")
+
+plt.tight_layout()
+plt.show()
+
+b.)
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+from google.colab import files
+# Upload an image
+print("Upload an image")
+uploaded = files.upload()
+# Read the uploaded image in grayscale
+image_name = list(uploaded.keys())[0]
+image = cv2.imread(image_name, cv2.IMREAD_GRAYSCALE)
+# Function to add Gaussian noise
+def add_gaussian_noise(image, mean=0, sigma=25):
+  noise = np.random.normal(mean, sigma, image.shape).astype(np.uint8)
+  noisy_image = cv2.add(image, noise) # Add noise to the image
+  return noisy_image
+# Add Gaussian noise to the image
+noisy_image = add_gaussian_noise(image)
+# Apply Box Filter (Mean Filter) with 3×3 and 7×7 kernels
+box_3x3 = cv2.blur(noisy_image, (3, 3))
+box_7x7 = cv2.blur(noisy_image, (7, 7))
+# Display the original, noisy, and filtered images
+plt.figure(figsize=(15, 8))
+plt.subplot(2, 2, 1)
+plt.imshow(image, cmap='gray')
+plt.title("Original Image")
+plt.xlabel("Width")
+plt.ylabel("Height")
+plt.subplot(2, 2, 2)
+plt.imshow(noisy_image, cmap='gray')
+plt.title("Noisy Image (Gaussian Noise)")
+plt.xlabel("Width")
+plt.ylabel("Height")
+plt.subplot(2, 2, 3)
+plt.imshow(box_3x3, cmap='gray')
+plt.title("Box Filter (3×3)")
+plt.xlabel("Width")
+plt.ylabel("Height")
+plt.subplot(2, 2, 4)
+plt.imshow(box_7x7, cmap='gray')
+plt.title("Box Filter (7×7)")
+plt.xlabel("Width")
+plt.ylabel("Height")
+plt.tight_layout()
+plt.show()
+
+// for this one look prev as both similar
+
+c.)
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+from google.colab import files
+# Upload an image
+print("Upload an image")
+uploaded = files.upload()
+# Read the uploaded image in grayscale
+image_name = list(uploaded.keys())[0]
+image = cv2.imread(image_name, cv2.IMREAD_GRAYSCALE)
+# Apply Median Filtering with 3×3 and 7×7 kernels
+median_3x3 = cv2.medianBlur(image, 3)
+median_7x7 = cv2.medianBlur(image, 7)
+# Display the original and filtered images
+plt.figure(figsize=(15, 5))
+plt.subplot(1, 3, 1)
+plt.imshow(image, cmap='gray')
+plt.title("Original Image")
+plt.xlabel("Width")
+plt.ylabel("Height")
+plt.subplot(1, 3, 2)
+plt.imshow(median_3x3, cmap='gray')
+plt.title("Median Filter (3×3)")
+plt.xlabel("Width")
+plt.ylabel("Height")
+plt.subplot(1, 3, 3)
+plt.imshow(median_7x7, cmap='gray')
+plt.title("Median Filter (7×7)")
+plt.xlabel("Width")
+plt.ylabel("Height")
+plt.tight_layout()
+plt.show()
+
+// w/o inbuilt function
+
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+from google.colab import files
+
+# Upload an image
+print("Upload an image")
+uploaded = files.upload()
+
+# Read the uploaded image in grayscale
+image_name = list(uploaded.keys())[0]
+image = cv2.imread(image_name, cv2.IMREAD_GRAYSCALE)
+
+# Manual median filter function
+def apply_median_filter(img, ksize):
+    pad = ksize // 2
+    padded_img = np.pad(img, ((pad, pad), (pad, pad)), mode='edge')
+    filtered_img = np.zeros_like(img)
+
+    for i in range(img.shape[0]):
+        for j in range(img.shape[1]):
+            roi = padded_img[i:i+ksize, j:j+ksize]
+            filtered_img[i, j] = np.median(roi)
+
+    return filtered_img
+
+# Apply median filters manually
+median_3x3 = apply_median_filter(image, 3)
+median_7x7 = apply_median_filter(image, 7)
+
+# Display the original and filtered images
+plt.figure(figsize=(15, 5))
+
+plt.subplot(1, 3, 1)
+plt.imshow(image, cmap='gray')
+plt.title("Original Image")
+plt.xlabel("Width")
+plt.ylabel("Height")
+
+plt.subplot(1, 3, 2)
+plt.imshow(median_3x3, cmap='gray')
+plt.title("Median Filter (3×3) - Manual")
+plt.xlabel("Width")
+plt.ylabel("Height")
+
+plt.subplot(1, 3, 3)
+plt.imshow(median_7x7, cmap='gray')
+plt.title("Median Filter (7×7) - Manual")
+plt.xlabel("Width")
+plt.ylabel("Height")
+
+plt.tight_layout()
+plt.show()
+
+d.)
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+from google.colab import files
+# Upload an image
+print("Upload an image (with Salt-and-Pepper noise)")
+uploaded = files.upload()
+# Read the uploaded image in grayscale
+image_name = list(uploaded.keys())[0]
+image = cv2.imread(image_name, cv2.IMREAD_GRAYSCALE)
+# Apply Median Filtering with 3×3 kernel
+median_filtered = cv2.medianBlur(image, 3)
+# Apply Averaging (Box) Filtering with 3×3 kernel
+avg_filtered = cv2.blur(image, (3, 3))
+# Display the original and filtered images
+plt.figure(figsize=(15, 5))
+plt.subplot(1, 3, 1)
+plt.imshow(image, cmap='gray')
+plt.title("Original Image (With Salt-and-Pepper Noise)")
+plt.xlabel("Width")
+plt.ylabel("Height")
+plt.subplot(1, 3, 2)
+plt.imshow(median_filtered, cmap='gray')
+plt.title("Median Filter (3×3) - Noise Removed")
+plt.xlabel("Width")
+plt.ylabel("Height")
+plt.subplot(1, 3, 3)
+plt.imshow(avg_filtered, cmap='gray')
+plt.title("Averaging Filter (3×3) - Blurred")
+plt.xlabel("Width")
+plt.ylabel("Height")
+plt.tight_layout()
+plt.show()
+
+// combination of both you know

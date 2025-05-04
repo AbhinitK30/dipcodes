@@ -1,0 +1,123 @@
+Exp No.2:
+
+a.)
+#negation
+
+import cv2
+from google.colab.patches import cv2_imshow
+from google.colab import files
+uploaded = files.upload()
+image_name = list(uploaded.keys())[0]
+image = cv2.imread(image_name, cv2.IMREAD_GRAYSCALE)
+# Create the negative of the image
+negative_image = 255 - image
+print("Original Grayscale Image:")
+cv2_imshow(image)
+print("Negative Image:")
+cv2_imshow(negative_image)
+
+b.)
+#log transformation
+
+import cv2
+import numpy as np
+from google.colab.patches import cv2_imshow
+from google.colab import files
+
+# Upload the image
+uploaded = files.upload()
+image_name = list(uploaded.keys())[0]
+
+# Read in grayscale
+image = cv2.imread(image_name, cv2.IMREAD_GRAYSCALE)
+
+# Convert to float to avoid overflow in log
+image = image.astype(np.float32)
+
+# Apply log transformation: s = c * log(1 + r)
+c = 255 / np.log(1 + np.max(image))
+log_transformed = c * np.log(1 + image)
+
+# Convert back to 8-bit unsigned int
+log_transformed = np.array(log_transformed, dtype=np.uint8)
+
+# Display images
+print("Original Grayscale Image:")
+cv2_imshow(image.astype(np.uint8))  # For display, back to uint8
+
+print("Log Transformed Image:")
+cv2_imshow(log_transformed)
+
+c.)
+#gamma transformation
+
+import cv2
+import numpy as np
+from google.colab.patches import cv2_imshow
+from google.colab import files
+uploaded = files.upload()
+image_name = list(uploaded.keys())[0]
+image = cv2.imread(image_name, cv2.IMREAD_GRAYSCALE)
+# Apply Gamma Correction (Power-Law Transformation)
+# Formula: s = c * r^gamma
+gamma = 0.5
+c = 255 / (np.max(image) ** gamma) # Normalization constant
+# Apply the transformation
+gamma_transformed = c * (image ** gamma)
+# Clip the values to be in the valid range [0, 255]
+gamma_transformed = np.array(gamma_transformed, dtype=np.uint8)
+print("Original Grayscale Image:")
+cv2_imshow(image)
+print(f"Gamma Transformed Image (Gamma={gamma}):")
+cv2_imshow(gamma_transformed)
+
+d.)
+#flipping
+
+import cv2
+from google.colab.patches import cv2_imshow
+from google.colab import files
+uploaded = files.upload()
+image_name = list(uploaded.keys())[0]
+image = cv2.imread(image_name)
+# Horizontal Flip
+horizontal_flip = cv2.flip(image, 1)
+# Vertical Flip
+vertical_flip = cv2.flip(image, 0)
+# Both Horizontal and Vertical Flip
+both_flip = cv2.flip(image, -1)
+print("Horizontal Flip:")
+cv2_imshow(horizontal_flip)
+print("Vertical Flip:")
+cv2_imshow(vertical_flip)
+print("Both Horizontal and Vertical Flip:")
+cv2_imshow(both_flip)
+
+// w/o inbuilt function
+
+import cv2
+import numpy as np
+from google.colab.patches import cv2_imshow
+from google.colab import files
+
+uploaded = files.upload()
+image_name = list(uploaded.keys())[0]
+image = cv2.imread(image_name)
+
+# Manual Horizontal Flip (flip columns)
+horizontal_flip = image[:, ::-1, :]
+
+# Manual Vertical Flip (flip rows)
+vertical_flip = image[::-1, :, :]
+
+# Manual Both Horizontal and Vertical Flip
+both_flip = image[::-1, ::-1, :]
+
+print("Horizontal Flip:")
+cv2_imshow(horizontal_flip)
+
+print("Vertical Flip:")
+cv2_imshow(vertical_flip)
+
+print("Both Horizontal and Vertical Flip:")
+cv2_imshow(both_flip)
