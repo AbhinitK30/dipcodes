@@ -114,73 +114,145 @@ print("\nDifference with Q90 (5x5 block):")
 print(np.abs(img.astype(np.float32) - img_Q90))
 
 f.)
-import cv2
 import numpy as np
+from scipy.fftpack import dct, idct
+import cv2
 import matplotlib.pyplot as plt
-from google.colab import files
 
-print("Upload a grayscale image")
+# Define block size
+block_size = 8
+
+# Standard JPEG Quantization matrix (Q50)
+Q50 = np.array([[16, 11, 10, 16, 24, 40, 51, 61],
+                [12, 12, 14, 19, 26, 58, 60, 55],
+                [14, 13, 16, 24, 40, 57, 69, 56],
+                [14, 17, 22, 29, 51, 87, 80, 62],
+                [18, 22, 37, 56, 68, 109, 103, 77],
+                [24, 35, 55, 64, 81, 104, 113, 92],
+                [49, 64, 78, 87, 103, 121, 120, 101],
+                [72, 92, 95, 98, 112, 100, 103, 99]])
+
+# Define Q10 and Q90 quantization matrices
+Q10 = Q50 * 0.1
+Q90 = Q50 * 1.5
+
+# Load an image (grayscale)
+# If running in Colab:
+from google.colab import files
 uploaded = files.upload()
-image_name = list(uploaded.keys())[0]  # Fixed typo: 'image name' -> 'image_name'
+image_name = list(uploaded.keys())[0]
 image = cv2.imread(image_name, cv2.IMREAD_GRAYSCALE)
 
-# Define kernels
-vertical_kernel = np.array([[-1, 2, -1],
-                            [-1, 2, -1],
-                            [-1, 2, -1]], dtype=np.float32)
+# Pad image to be divisible by 8
+height, width = image.shape
+pad_h = (block_size - height % block_size) % block_size
+pad_w = (block_size - width % block_size) % block_size
+image_padded = np.pad(image, ((0, pad_h), (0, pad_w)), mode='constant', constant_values=0)
 
-horizontal_kernel = np.array([[-1, -1, -1],
-                              [ 2,  2,  2],
-                              [-1, -1, -1]], dtype=np.float32)
+# Function to apply DCT and quantization
+def apply_dct_and_quantization(image, quantization_matrix):
+    height, width = image.shape
+    quantized_image = np.zeros_like(image, dtype=float)
+    for i in range(0, height, block_size):
+        for j in range(0, width, block_size):
+            block = image[i:i+block_size, j:j+block_size]
+            block = block.astype(float) - 128  # Level shifting
+            dct_block = dct(dct(block.T, norm='ortho').T, norm='ortho')  # Apply DCT
+            quantized_block = np.round(dct_block / quantization_matrix)  # Quantization
+            quantized_image[i:i+block_size, j:j+block_size] = quantized_block
+    return quantized_image
 
-diag_45_kernel = np.array([[-1, -1,  2],
-                           [-1,  2, -1],
-                           [ 2, -1, -1]], dtype=np.float32)
+# Function to apply dequantization and IDCT
+def apply_dequantization_and_idct(quantized_image, quantization_matrix):
+    height, width = quantized_image.shape
+    reconstructed_image = np.zeros_like(quantized_image, dtype=float)
+    for i in range(0, height, block_size):
+        for j in range(0, width, block_size):
+            quantized_block = quantized_image[i:i+block_size, j:j+block_size]
+            dct_block = quantized_block * quantization_matrix  # Dequantization
+            idct_block = idct(idct(dct_block.T, norm='ortho').T, norm='ortho')  # IDCT
+            idct_block = idct_block + 128  # Level shift back
+            reconstructed_image[i:i+block_size, j:j+block_size] = idct_block
+    return reconstructed_image
 
-diag_minus_45_kernel = np.array([[ 2, -1, -1],
-                                 [-1,  2, -1],
-                                 [-1, -1,  2]], dtype=np.float32)
+# Apply DCT and quantization with Q10, Q50, and Q90
+quantized_image_q10 = apply_dct_and_quantization(image_padded, Q10)
+quantized_image_q50 = apply_dct_and_quantization(image_padded, Q50)
+quantized_image_q90 = apply_dct_and_quantization(image_padded, Q90)
 
-# Manual convolution function
-def apply_custom_filter(img, kernel):
-    padded = np.pad(img, ((1, 1), (1, 1)), mode='constant', constant_values=0)
-    output = np.zeros_like(img, dtype=np.float32)
+# Apply dequantization and IDCT to reconstruct the images
+reconstructed_image_q10 = apply_dequantization_and_idct(quantized_image_q10, Q10)
+reconstructed_image_q50 = apply_dequantization_and_idct(quantized_image_q50, Q50)
+reconstructed_image_q90 = apply_dequantization_and_idct(quantized_image_q90, Q90)
 
-    for i in range(img.shape[0]):
-        for j in range(img.shape[1]):
-            region = padded[i:i+3, j:j+3]
-            output[i, j] = np.sum(region * kernel)
+# Remove padding
+reconstructed_image_q10 = reconstructed_image_q10[:height, :width]
+reconstructed_image_q50 = reconstructed_image_q50[:height, :width]
+reconstructed_image_q90 = reconstructed_image_q90[:height, :width]
 
-    output = np.clip(output, 0, 255).astype(np.uint8)
-    return output
+# Clip the pixel values to the valid range [0, 255]
+reconstructed_image_q10 = np.clip(reconstructed_image_q10, 0, 255).astype(np.uint8)
+reconstructed_image_q50 = np.clip(reconstructed_image_q50, 0, 255).astype(np.uint8)
+reconstructed_image_q90 = np.clip(reconstructed_image_q90, 0, 255).astype(np.uint8)
 
-# Apply filters manually
-vertical_lines = apply_custom_filter(image, vertical_kernel)
-horizontal_lines = apply_custom_filter(image, horizontal_kernel)
-diag_45_lines = apply_custom_filter(image, diag_45_kernel)
-diag_minus_45_lines = apply_custom_filter(image, diag_minus_45_kernel)
+# Plot the original, DCT, and reconstructed images
+plt.figure(figsize=(15, 10))
 
-# Display results
-plt.figure(figsize=(12, 8))
-plt.subplot(2, 3, 1)
+# Original Image
+plt.subplot(4, 3, 1)
 plt.imshow(image, cmap='gray')
-plt.title("Original Image")
-plt.axis("off")
-plt.subplot(2, 3, 2)
-plt.imshow(vertical_lines, cmap='gray')
-plt.title("Vertical Line Detection")
-plt.axis("off")
-plt.subplot(2, 3, 3)
-plt.imshow(horizontal_lines, cmap='gray')
-plt.title("Horizontal Line Detection")
-plt.axis("off")
-plt.subplot(2, 3, 4)
-plt.imshow(diag_45_lines, cmap='gray')
-plt.title("Diagonal 45° Line Detection")
-plt.axis("off")
-plt.subplot(2, 3, 5)
-plt.imshow(diag_minus_45_lines, cmap='gray')
-plt.title("Diagonal -45° Line Detection")
-plt.axis("off")
+plt.title('Original Image')
+plt.axis('off')
+
+# DCT of Original Image
+dct_original = dct(dct(image.astype(float).T, norm='ortho').T, norm='ortho')
+plt.subplot(4, 3, 2)
+plt.imshow(np.log1p(np.abs(dct_original)), cmap='gray')
+plt.title('DCT of Original Image')
+plt.axis('off')
+
+# IDCT of Original Image (should be close to the original)
+idct_original = idct(idct(dct_original.T, norm='ortho').T, norm='ortho')
+plt.subplot(4, 3, 3)
+plt.imshow(idct_original, cmap='gray')
+plt.title('IDCT of Original Image')
+plt.axis('off')
+
+# Q10 Quantized DCT
+plt.subplot(4, 3, 4)
+plt.imshow(np.log1p(np.abs(quantized_image_q10)), cmap='gray')
+plt.title('DCT (Q10 Quantized)')
+plt.axis('off')
+
+# Q10 Reconstructed Image
+plt.subplot(4, 3, 5)
+plt.imshow(reconstructed_image_q10, cmap='gray')
+plt.title('IDCT (Q10 Reconstructed)')
+plt.axis('off')
+
+# Q50 Quantized DCT
+plt.subplot(4, 3, 7)
+plt.imshow(np.log1p(np.abs(quantized_image_q50)), cmap='gray')
+plt.title('DCT (Q50 Quantized)')
+plt.axis('off')
+
+# Q50 Reconstructed Image
+plt.subplot(4, 3, 8)
+plt.imshow(reconstructed_image_q50, cmap='gray')
+plt.title('IDCT (Q50 Reconstructed)')
+plt.axis('off')
+
+# Q90 Quantized DCT
+plt.subplot(4, 3, 10)
+plt.imshow(np.log1p(np.abs(quantized_image_q90)), cmap='gray')
+plt.title('DCT (Q90 Quantized)')
+plt.axis('off')
+
+# Q90 Reconstructed Image
+plt.subplot(4, 3, 11)
+plt.imshow(reconstructed_image_q90, cmap='gray')
+plt.title('IDCT (Q90 Reconstructed)')
+plt.axis('off')
+
 plt.tight_layout()
 plt.show()
