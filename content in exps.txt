@@ -1,0 +1,43 @@
+exp1:
+1.disp
+2.rotate
+3.add
+4.resize
+5.threshold
+6.noise add
+7.histogram
+
+exp2:
+1.negation
+2.log transform
+3.gamma transform
+4.flipping
+
+exp3:
+1.graylevel slicing
+2.bitplane slicing
+3.contrast stretching
+
+exp4:
+1.histogram plotting
+2.equalized histogram plotting
+
+exp5:
+1.box filter
+2.median filter
+3.weighted avg filter
+
+exp6:
+1.point detection
+2.line detection
+3.thresholding
+
+exp7:
+1.edge detection using robert, prewitt, sobel ops
+
+exp8:
+1.image compression
+2.dct & idct
+
+exp9:
+1.huffman coding & compression ratio
