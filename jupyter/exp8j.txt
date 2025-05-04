@@ -1,0 +1,252 @@
+Exp No.8:
+
+a.)
+#this code is correct(don't refer the drive one)
+
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.fftpack import dct, idct
+# Load grayscale image
+img = cv2.imread("TE1.bmp", cv2.IMREAD_GRAYSCALE)
+# Get image dimensions
+h, w = img.shape
+resized_img = cv2.resize(img,(8,8),interpolation=cv2.INTER_AREA)
+cv2.imwrite("resized_image.tif",resized_img)
+
+b.)
+print(resized_img.shape)
+
+c.)
+plt.imshow(img,cmap='gray')
+
+d.)
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.fftpack import dct, idct
+
+# Load grayscale image
+image_path = 'TE1.bmp'  # Replace with actual path
+image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+# Define block size
+block_size = 8
+
+# Standard JPEG Quantization matrix (Q50)
+Q50 = np.array([[16, 11, 10, 16, 24, 40, 51, 61],
+                [12, 12, 14, 19, 26, 58, 60, 55],
+                [14, 13, 16, 24, 40, 57, 69, 56],
+                [14, 17, 22, 29, 51, 87, 80, 62],
+                [18, 22, 37, 56, 68, 109, 103, 77],
+                [24, 35, 55, 64, 81, 104, 113, 92],
+                [49, 64, 78, 87, 103, 121, 120, 101],
+                [72, 92, 95, 98, 112, 100, 103, 99]])
+
+# Generate Q10 (Strong Compression) and Q90 (High Quality)
+def generate_quality_matrix(Q, quality):
+  scale = 50 if quality >= 50 else 5000 / quality
+  Q_new = np.floor((Q * scale + 50) / 100)
+  return np.clip(Q_new, 1, 255)
+
+Q10 = generate_quality_matrix(Q50, 10)
+Q90 = generate_quality_matrix(Q50, 90)
+
+# DCT and IDCT functions
+def dct_2d(block):
+  return dct(dct(block.T, norm='ortho').T, norm='ortho')
+
+def idct_2d(block):
+  return idct(idct(block.T, norm='ortho').T, norm='ortho')
+
+# Compression function
+def compress_image(img, Q):
+  h, w = img.shape
+  pad_h = (block_size - h % block_size) % block_size
+  pad_w = (block_size - w % block_size) % block_size
+  padded_img = np.pad(img, ((0, pad_h), (0, pad_w)), mode='constant', constant_values=0)
+  padded_h, padded_w = padded_img.shape
+
+  DCT_img = np.zeros((padded_h, padded_w), dtype=np.float32)
+  IDCT_img = np.zeros((padded_h, padded_w), dtype=np.float32)
+  reconstructed_img = np.zeros((padded_h, padded_w), dtype=np.uint8)
+
+  for i in range(0, padded_h, block_size):
+    for j in range(0, padded_w, block_size):
+      block = padded_img[i:i+block_size, j:j+block_size].astype(np.float32) - 128
+      D = dct_2d(block)
+      C = np.round(D / Q)
+      R = C * Q
+      M_reconstructed = np.round(idct_2d(R)) + 128
+      DCT_img[i:i+block_size, j:j+block_size] = D
+      IDCT_img[i:i+block_size, j:j+block_size] = R
+      reconstructed_img[i:i+block_size, j:j+block_size] = np.clip(M_reconstructed, 0, 255)
+
+  return reconstructed_img[:h, :w], DCT_img[:h, :w], IDCT_img[:h, :w]
+
+# Compress image using different quality levels
+img_Q50 = compress_image(img, Q50)
+img_Q10 = compress_image(img, Q10)
+img_Q90 = compress_image(img, Q90)
+
+# Display images
+fig, ax = plt.subplots(2, 2, figsize=(10, 8))
+ax[0][0].imshow(img, cmap='gray', vmin=0, vmax=255)
+ax[0][0].set_title("Original Image")
+ax[0][1].imshow(img_Q50[0], cmap='gray', vmin=0, vmax=255)
+ax[0][1].set_title("Reconstructed Image (Q50)")
+ax[1][0].imshow(img_Q10[0], cmap='gray', vmin=0, vmax=255)
+ax[1][0].set_title("Reconstructed Image (Q10 - Strong Compression)")
+ax[1][1].imshow(img_Q90[0], cmap='gray', vmin=0, vmax=255)
+ax[1][1].set_title("Reconstructed Image (Q90 - High Quality)")
+plt.tight_layout()
+plt.show()
+
+e.)
+print("\nDifference with Q50 (5x5 block):")
+print(np.abs(img.astype(np.float32) - img_Q50))
+print("\nDifference with Q10 (5x5 block):")
+print(np.abs(img.astype(np.float32) - img_Q10))
+print("\nDifference with Q90 (5x5 block):")
+print(np.abs(img.astype(np.float32) - img_Q90))
+
+f.)
+import numpy as np
+from scipy.fftpack import dct, idct
+import cv2
+import matplotlib.pyplot as plt
+
+# Define block size
+block_size = 8
+
+# Standard JPEG Quantization matrix (Q50)
+Q50 = np.array([[16, 11, 10, 16, 24, 40, 51, 61],
+                [12, 12, 14, 19, 26, 58, 60, 55],
+                [14, 13, 16, 24, 40, 57, 69, 56],
+                [14, 17, 22, 29, 51, 87, 80, 62],
+                [18, 22, 37, 56, 68, 109, 103, 77],
+                [24, 35, 55, 64, 81, 104, 113, 92],
+                [49, 64, 78, 87, 103, 121, 120, 101],
+                [72, 92, 95, 98, 112, 100, 103, 99]])
+
+# Define Q10 and Q90 quantization matrices
+Q10 = Q50 * 0.1
+Q90 = Q50 * 1.5
+
+# Load an image (grayscale)
+image_path = 'TE1.bmp'  # Replace with actual path
+image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+# Pad image to be divisible by 8
+height, width = image.shape
+pad_h = (block_size - height % block_size) % block_size
+pad_w = (block_size - width % block_size) % block_size
+image_padded = np.pad(image, ((0, pad_h), (0, pad_w)), mode='constant', constant_values=0)
+
+# Function to apply DCT and quantization
+def apply_dct_and_quantization(image, quantization_matrix):
+    height, width = image.shape
+    quantized_image = np.zeros_like(image, dtype=float)
+    for i in range(0, height, block_size):
+        for j in range(0, width, block_size):
+            block = image[i:i+block_size, j:j+block_size]
+            block = block.astype(float) - 128  # Level shifting
+            dct_block = dct(dct(block.T, norm='ortho').T, norm='ortho')  # Apply DCT
+            quantized_block = np.round(dct_block / quantization_matrix)  # Quantization
+            quantized_image[i:i+block_size, j:j+block_size] = quantized_block
+    return quantized_image
+
+# Function to apply dequantization and IDCT
+def apply_dequantization_and_idct(quantized_image, quantization_matrix):
+    height, width = quantized_image.shape
+    reconstructed_image = np.zeros_like(quantized_image, dtype=float)
+    for i in range(0, height, block_size):
+        for j in range(0, width, block_size):
+            quantized_block = quantized_image[i:i+block_size, j:j+block_size]
+            dct_block = quantized_block * quantization_matrix  # Dequantization
+            idct_block = idct(idct(dct_block.T, norm='ortho').T, norm='ortho')  # IDCT
+            idct_block = idct_block + 128  # Level shift back
+            reconstructed_image[i:i+block_size, j:j+block_size] = idct_block
+    return reconstructed_image
+
+# Apply DCT and quantization with Q10, Q50, and Q90
+quantized_image_q10 = apply_dct_and_quantization(image_padded, Q10)
+quantized_image_q50 = apply_dct_and_quantization(image_padded, Q50)
+quantized_image_q90 = apply_dct_and_quantization(image_padded, Q90)
+
+# Apply dequantization and IDCT to reconstruct the images
+reconstructed_image_q10 = apply_dequantization_and_idct(quantized_image_q10, Q10)
+reconstructed_image_q50 = apply_dequantization_and_idct(quantized_image_q50, Q50)
+reconstructed_image_q90 = apply_dequantization_and_idct(quantized_image_q90, Q90)
+
+# Remove padding
+reconstructed_image_q10 = reconstructed_image_q10[:height, :width]
+reconstructed_image_q50 = reconstructed_image_q50[:height, :width]
+reconstructed_image_q90 = reconstructed_image_q90[:height, :width]
+
+# Clip the pixel values to the valid range [0, 255]
+reconstructed_image_q10 = np.clip(reconstructed_image_q10, 0, 255).astype(np.uint8)
+reconstructed_image_q50 = np.clip(reconstructed_image_q50, 0, 255).astype(np.uint8)
+reconstructed_image_q90 = np.clip(reconstructed_image_q90, 0, 255).astype(np.uint8)
+
+# Plot the original, DCT, and reconstructed images
+plt.figure(figsize=(15, 10))
+
+# Original Image
+plt.subplot(4, 3, 1)
+plt.imshow(image, cmap='gray')
+plt.title('Original Image')
+plt.axis('off')
+
+# DCT of Original Image
+dct_original = dct(dct(image.astype(float).T, norm='ortho').T, norm='ortho')
+plt.subplot(4, 3, 2)
+plt.imshow(np.log1p(np.abs(dct_original)), cmap='gray')
+plt.title('DCT of Original Image')
+plt.axis('off')
+
+# IDCT of Original Image (should be close to the original)
+idct_original = idct(idct(dct_original.T, norm='ortho').T, norm='ortho')
+plt.subplot(4, 3, 3)
+plt.imshow(idct_original, cmap='gray')
+plt.title('IDCT of Original Image')
+plt.axis('off')
+
+# Q10 Quantized DCT
+plt.subplot(4, 3, 4)
+plt.imshow(np.log1p(np.abs(quantized_image_q10)), cmap='gray')
+plt.title('DCT (Q10 Quantized)')
+plt.axis('off')
+
+# Q10 Reconstructed Image
+plt.subplot(4, 3, 5)
+plt.imshow(reconstructed_image_q10, cmap='gray')
+plt.title('IDCT (Q10 Reconstructed)')
+plt.axis('off')
+
+# Q50 Quantized DCT
+plt.subplot(4, 3, 7)
+plt.imshow(np.log1p(np.abs(quantized_image_q50)), cmap='gray')
+plt.title('DCT (Q50 Quantized)')
+plt.axis('off')
+
+# Q50 Reconstructed Image
+plt.subplot(4, 3, 8)
+plt.imshow(reconstructed_image_q50, cmap='gray')
+plt.title('IDCT (Q50 Reconstructed)')
+plt.axis('off')
+
+# Q90 Quantized DCT
+plt.subplot(4, 3, 10)
+plt.imshow(np.log1p(np.abs(quantized_image_q90)), cmap='gray')
+plt.title('DCT (Q90 Quantized)')
+plt.axis('off')
+
+# Q90 Reconstructed Image
+plt.subplot(4, 3, 11)
+plt.imshow(reconstructed_image_q90, cmap='gray')
+plt.title('IDCT (Q90 Reconstructed)')
+plt.axis('off')
+
+plt.tight_layout()
+plt.show()

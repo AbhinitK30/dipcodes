@@ -1,0 +1,224 @@
+Exp No.3:
+
+a.)
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Manually provide the image path here
+image_path = 'int_slicing1.bmp'  # <-- Change this to your image file path
+
+# Read the image in grayscale
+gls_img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+# Check if the image loaded correctly
+if gls_img is None:
+    print("❌ Error loading image. Please upload a valid grayscale image.")
+else:
+    # Input lower and upper intensity values for gray level slicing
+    A = int(input('Enter lower intensity value (A): '))
+    B = int(input('Enter higher intensity value (B): '))
+
+    plt.figure(figsize=(8, 8))
+
+    # Original Image
+    plt.subplot(1, 3, 1)
+    plt.title('Original Image')
+    plt.imshow(gls_img, cmap='gray')
+    plt.axis('off')
+
+    # Without Background (slicing in given intensity range)
+    gls_img_no_bg = np.zeros_like(gls_img)
+    for i in range(len(gls_img)):
+        for j in range(len(gls_img[0])):
+            if A <= gls_img[i][j] <= B:
+                gls_img_no_bg[i][j] = 255
+            else:
+                gls_img_no_bg[i][j] = 0
+
+    plt.subplot(1, 3, 2)
+    plt.title('Without Background')
+    plt.imshow(gls_img_no_bg, cmap='gray')
+    plt.axis('off')
+
+    # With Background (slicing in given intensity range)
+    gls_img_bg = np.zeros_like(gls_img)
+    for i in range(len(gls_img)):
+        for j in range(len(gls_img[0])):
+            if A <= gls_img[i][j] <= B:
+                gls_img_bg[i][j] = 255
+            else:
+                gls_img_bg[i][j] = gls_img[i][j]
+
+    plt.subplot(1, 3, 3)
+    plt.title('With Background')
+    plt.imshow(gls_img_bg, cmap='gray')
+    plt.axis('off')
+
+    plt.tight_layout()
+    plt.show()
+
+    # Save the resulting image
+    plt.savefig('Intensity_Slicing_No_BG.png')
+
+b.)
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Manually provide the image path here (e.g., 'image.jpg')
+image_path = 'TS1.bmp'  # <-- Change this to your image file path
+
+# Read the image as grayscale
+dollar = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+# Create arrays for each bit plane
+plane1_MSB = np.zeros_like(dollar)
+plane2 = np.zeros_like(dollar)
+plane3 = np.zeros_like(dollar)
+plane4 = np.zeros_like(dollar)
+plane5 = np.zeros_like(dollar)
+plane6 = np.zeros_like(dollar)
+plane7 = np.zeros_like(dollar)
+plane8_LSB = np.zeros_like(dollar)
+
+# Extract each bit plane
+for i in range(len(dollar)):
+    for j in range(len(dollar[0])):
+        value = dollar[i][j]
+        plane1_MSB[i][j] = value >> 7 & 1
+        plane2[i][j] = value >> 6 & 1
+        plane3[i][j] = value >> 5 & 1
+        plane4[i][j] = value >> 4 & 1
+        plane5[i][j] = value >> 3 & 1
+        plane6[i][j] = value >> 2 & 1
+        plane7[i][j] = value >> 1 & 1
+        plane8_LSB[i][j] = value & 1
+
+# Plotting the images
+fig, axs = plt.subplots(3, 3, figsize=(10, 10))
+# Display the original image
+axs[0, 0].imshow(dollar, cmap='gray')
+axs[0, 0].set_title('Original Image')
+axs[0, 0].axis('off')
+
+# Display the bit planes
+axs[0, 1].imshow(plane1_MSB, cmap='gray')
+axs[0, 1].set_title('Plane 1 (MSB)')
+axs[0, 1].axis('off')
+axs[0, 2].imshow(plane2, cmap='gray')
+axs[0, 2].set_title('Plane 2')
+axs[0, 2].axis('off')
+axs[1, 0].imshow(plane3, cmap='gray')
+axs[1, 0].set_title('Plane 3')
+axs[1, 0].axis('off')
+axs[1, 1].imshow(plane4, cmap='gray')
+axs[1, 1].set_title('Plane 4')
+axs[1, 1].axis('off')
+axs[1, 2].imshow(plane5, cmap='gray')
+axs[1, 2].set_title('Plane 5')
+axs[1, 2].axis('off')
+axs[2, 0].imshow(plane6, cmap='gray')
+axs[2, 0].set_title('Plane 6')
+axs[2, 0].axis('off')
+axs[2, 1].imshow(plane7, cmap='gray')
+axs[2, 1].set_title('Plane 7')
+axs[2, 1].axis('off')
+axs[2, 2].imshow(plane8_LSB, cmap='gray')
+axs[2, 2].set_title('Plane 8 (LSB)')
+axs[2, 2].axis('off')
+
+# Adjust layout to prevent overlap
+plt.tight_layout()
+plt.show()
+
+# Save the bit plane image
+plt.savefig('Bit_plane_Slicing.png')
+
+# Effects of concatenation of different planes
+# 4 highest bit planes for reconstruction
+reconstructed_image_1 = (plane1_MSB << 7) | (plane2 << 6)
+reconstructed_image_2 = (plane1_MSB << 7) | (plane2 << 6) | (plane3 << 5)
+reconstructed_image_3 = (plane1_MSB << 7) | (plane2 << 6) | (plane3 << 5) | (plane4 << 4)
+
+# Plot the concatenated bit planes
+plt.figure(figsize=(10, 10))
+
+plt.subplot(1, 3, 1)
+plt.imshow(reconstructed_image_1, cmap='gray')
+plt.title('Concatenate Plane 1 & 2')
+plt.axis('off')
+
+plt.subplot(1, 3, 2)
+plt.imshow(reconstructed_image_2, cmap='gray')
+plt.title('Concatenate Plane 1 to 3')
+plt.axis('off')
+
+plt.subplot(1, 3, 3)
+plt.imshow(reconstructed_image_3, cmap='gray')
+plt.title('Concatenate Plane 1 to 4')
+plt.axis('off')
+
+# Show the concatenated images
+plt.tight_layout()
+plt.show()
+
+# Save the concatenated bit plane image
+plt.savefig('Concatenated_Bit_Plane_Slicing.png')
+
+c.)
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Provide the image path here
+image_path = 'hist4.bmp'  # Change this to your image path
+
+# Read the image as grayscale
+coffee = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+# Check if image is loaded correctly
+if coffee is None:
+    print("❌ Error loading image. Please check the file path.")
+else:
+    # Prompt user for input values
+    r1 = int(input('Enter r1 : '))
+    s1 = int(input('Enter s1 : '))
+    r2 = int(input('Enter r2 : '))
+    s2 = int(input('Enter s2 : '))
+
+    # Initialize the contrast-stretched image
+    contrast = np.zeros_like(coffee)
+
+    # Apply the contrast stretching formula
+    for i in range(coffee.shape[0]):
+        for j in range(coffee.shape[1]):
+            if coffee[i][j] < r1:
+                contrast[i][j] = s1
+            elif coffee[i][j] > r2:
+                contrast[i][j] = s2
+            else:
+                contrast[i][j] = int(((s2 - s1) / (r2 - r1)) * (coffee[i][j] - r1) + s1)
+            contrast[i][j] = np.clip(contrast[i][j], 0, 255)  # Ensure values stay in the range [0, 255]
+
+    # Plotting the images
+    plt.figure(figsize=(8, 8))
+
+    # Original Image
+    plt.subplot(1, 2, 1)
+    plt.imshow(coffee, cmap='gray')
+    plt.title('Original Image')
+    plt.axis('off')
+
+    # Contrast Stretched Image
+    plt.subplot(1, 2, 2)
+    plt.imshow(contrast, cmap='gray')
+    plt.title('Contrast Stretched Image')
+    plt.axis('off')
+
+    # Adjust layout and show
+    plt.tight_layout()
+    plt.show()
+
+    # Save the contrast stretched image
+    plt.savefig('Contrast_Stretching.png')

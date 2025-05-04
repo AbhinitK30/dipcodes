@@ -1,0 +1,326 @@
+Exp No.1:
+
+a.)
+from matplotlib import pyplot as plt
+import cv2
+
+img_color = cv2.imread('lavender.jpg',1)
+img_grayscale = cv2.imread('lavender.jpg',0)
+img_unchanged = cv2.imread('lavender.jpg',-1)
+
+plt.imshow(img_color)
+plt.show()
+plt.imshow(cv2.cvtColor(img_color, cv2.COLOR_BGR2RGB))
+plt.show()
+plt.imshow(cv2.cvtColor(img_grayscale, cv2.COLOR_BGR2RGB))
+plt.show()
+
+b.)
+import cv2
+from matplotlib import pyplot as plt
+
+image_path = 'lavender.jpg'
+image = cv2.imread(image_path)
+print("Original Image:")
+plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+plt.axis('off')
+plt.show()
+
+# Resize the image to a specific size (e.g., 300x300 pixels)
+resized_image_fixed = cv2.resize(image, (300, 300), interpolation=cv2.INTER_LINEAR)
+print("Resized Image (300x300):")
+plt.imshow(cv2.cvtColor(resized_image_fixed, cv2.COLOR_BGR2RGB))
+plt.axis('off')
+plt.show()
+
+# Resize the image by scale factors (e.g., half the size)
+resized_image_scaled = cv2.resize(image, None, fx=0.5, fy=0.5, interpolation=cv2.INTER_AREA)
+print("Resized Image (50% of original size):")
+plt.imshow(cv2.cvtColor(resized_image_scaled, cv2.COLOR_BGR2RGB))
+plt.axis('off')
+plt.show()
+
+c.)
+import cv2
+from matplotlib import pyplot as plt
+
+# 🖼️ Manually provide the image path here
+file_name = 'lavender.jpg'  # <-- Change this to your image file path
+
+# Read the image using OpenCV
+image = cv2.imread(file_name)
+
+# Check if image loaded successfully
+if image is None:
+    print(f"Error: Could not load image from {file_name}. Please check the file.")
+else:
+    # Convert BGR to RGB for proper display in matplotlib
+    def show_image(img, title):
+        plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+        plt.title(title)
+        plt.axis('off')
+        plt.show()
+
+    print(f"Uploaded file: {file_name}")
+    
+    print("Uploaded Image:")
+    show_image(image, "Original Image")
+
+    # Rotate 90 degrees clockwise
+    rotated_90_cw = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
+    print("Image Rotated 90 Degrees Clockwise:")
+    show_image(rotated_90_cw, "Rotated 90° CW")
+
+    # Rotate 90 degrees counterclockwise
+    rotated_90_ccw = cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE)
+    print("Image Rotated 90 Degrees Counterclockwise:")
+    show_image(rotated_90_ccw, "Rotated 90° CCW")
+
+    # Rotate 180 degrees
+    rotated_180 = cv2.rotate(image, cv2.ROTATE_180)
+    print("Image Rotated 180 Degrees:")
+    show_image(rotated_180, "Rotated 180°")
+
+// w/o inbuilt function
+
+import cv2
+import numpy as np
+from matplotlib import pyplot as plt
+
+# 🖼️ Manually provide the image path here
+file_name = 'lavender.jpg'  # <-- Change this to your image file path
+
+# Read the image using OpenCV
+image = cv2.imread(file_name)
+
+# Check if image loaded successfully
+if image is None:
+    print(f"Error: Could not load image from {file_name}. Please check the file.")
+else:
+    # Helper to display image
+    def show_image(img, title):
+        plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+        plt.title(title)
+        plt.axis('off')
+        plt.show()
+
+    print(f"Uploaded file: {file_name}")
+    print("Uploaded Image:")
+    show_image(image, "Original Image")
+
+    # Get image dimensions
+    h, w = image.shape[:2]
+
+    # 90 Degrees Clockwise: Transpose + horizontal flip
+    rotated_90_cw = np.transpose(image, (1, 0, 2))[:, ::-1]
+    print("Image Rotated 90 Degrees Clockwise:")
+    show_image(rotated_90_cw, "Rotated 90° CW (Manual)")
+
+    # 90 Degrees Counterclockwise: Transpose + vertical flip
+    rotated_90_ccw = np.transpose(image, (1, 0, 2))[::-1, :]
+    print("Image Rotated 90 Degrees Counterclockwise:")
+    show_image(rotated_90_ccw, "Rotated 90° CCW (Manual)")
+
+    # 180 Degrees: Flip both horizontally and vertically
+    rotated_180 = image[::-1, ::-1]
+    print("Image Rotated 180 Degrees:")
+    show_image(rotated_180, "Rotated 180° (Manual)")
+
+d.)
+import cv2
+from matplotlib import pyplot as plt
+
+# Manually provide the paths of the two images
+image_path1 = 'fl1.bmp'  # <-- Change this to the path of the first image
+image_path2 = 'flower.jpg'  # <-- Change this to the path of the second image
+
+# Read both images using OpenCV
+img1 = cv2.imread(image_path1)
+img2 = cv2.imread(image_path2)
+
+# Check if both images loaded successfully
+if img1 is None or img2 is None:
+    print("One or both images could not be loaded. Please check the file paths and formats.")
+else:
+    # Step: Resize both images to the same dimensions
+    height, width = 300, 300  # Desired size for resizing
+    img1_resized = cv2.resize(img1, (width, height))
+    img2_resized = cv2.resize(img2, (width, height))
+
+    # Convert BGR to RGB for proper display in matplotlib
+    def show_image(img, title):
+        plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+        plt.title(title)
+        plt.axis('off')
+        plt.show()
+
+    print("First Image (Resized):")
+    show_image(img1_resized, "First Image")
+
+    print("Second Image (Resized):")
+    show_image(img2_resized, "Second Image")
+
+    # Step: Add the two images
+    added_image = cv2.add(img1_resized, img2_resized)
+
+    print("Added Image:")
+    show_image(added_image, "Added Image")
+
+e.)
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Manually provide the image path here
+image_path = 'lavender.jpg'  # <-- Change this to your image file path
+
+# Read the image using OpenCV
+image = cv2.imread(image_path)
+
+# Check if image loaded successfully
+if image is None:
+    print(f"Error: Could not load image from {image_path}. Please check the file.")
+else:
+    # Display the original image using matplotlib
+    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # Convert BGR to RGB for matplotlib
+    plt.imshow(image_rgb)
+    plt.title("Original Image")
+    plt.axis('off')
+    plt.show()
+
+    # Define the channels and colors for plotting the histograms
+    channels = ['Blue', 'Green', 'Red']
+    colors = ['b', 'g', 'r']
+
+    # Create a plot for histograms
+    plt.figure(figsize=(10, 5))
+    for i, color in enumerate(colors):
+        # Calculate histogram for each channel
+        hist = cv2.calcHist([image], [i], None, [256], [0, 256])
+        plt.plot(hist, color=color, label=f"{channels[i]} Channel")
+
+    # Customize the plot
+    plt.title("RGB Histogram")
+    plt.xlabel("Pixel Intensity")
+    plt.ylabel("Frequency")
+    plt.legend()
+    plt.grid()
+    plt.show()
+
+// w/o inbuilt function
+
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Manually provide the image path here
+image_path = 'lavender.jpg'  # <-- Change this to your image file path
+
+# Read the image using OpenCV
+image = cv2.imread(image_path)
+
+# Check if image loaded successfully
+if image is None:
+    print(f"Error: Could not load image from {image_path}. Please check the file.")
+else:
+    # Display the original image using matplotlib
+    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # Convert BGR to RGB for matplotlib
+    plt.imshow(image_rgb)
+    plt.title("Original Image")
+    plt.axis('off')
+    plt.show()
+
+    # Define the channels and colors for plotting the histograms
+    channels = ['Blue', 'Green', 'Red']
+    colors = ['b', 'g', 'r']
+
+    # Create a plot for histograms
+    plt.figure(figsize=(10, 5))
+    for i, color in enumerate(colors):
+        # Manually calculate histogram for each channel
+        channel_data = image[:, :, i]  # Extract the i-th channel (Blue=0, Green=1, Red=2)
+        
+        # Calculate the histogram
+        hist = np.zeros(256, dtype=int)
+        for pixel_value in channel_data.flatten():
+            hist[pixel_value] += 1
+        
+        plt.plot(hist, color=color, label=f"{channels[i]} Channel")
+
+    # Customize the plot
+    plt.title("RGB Histogram (Manual)")
+    plt.xlabel("Pixel Intensity")
+    plt.ylabel("Frequency")
+    plt.legend()
+    plt.grid()
+    plt.show()
+
+f.)
+import cv2
+import matplotlib.pyplot as plt
+
+# Manually provide the image path here
+image_path = 'lavender.jpg'  # <-- Change this to your image file path
+
+# Load the image in grayscale
+image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+# Check if the image loaded successfully
+if image is None:
+    print(f"Error: Could not load image from {image_path}. Please check the file.")
+else:
+    # Apply simple thresholding
+    threshold_value = 127
+    max_value = 255
+    _, binary_thresh = cv2.threshold(image, threshold_value, max_value, cv2.THRESH_BINARY)
+
+    # Function to display images using matplotlib
+    def show_image(img, title):
+        plt.imshow(img, cmap='gray')  # 'gray' colormap for grayscale images
+        plt.title(title)
+        plt.axis('off')
+        plt.show()
+
+    print("Original Image:")
+    show_image(image, "Original Image")
+
+    print("Thresholded Image (Binary):")
+    show_image(binary_thresh, "Thresholded Image")
+
+g.)
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Manually provide the image path here
+image_path = 'lavender.jpg'  # <-- Change this to your image file path
+
+# Load the image using OpenCV
+image = cv2.imread(image_path)
+
+# Convert the image to grayscale
+gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+# Add noise to the image using cv2.randn
+mean = 0
+stddev = 50
+noise = np.zeros_like(gray_image, dtype=np.int16)  # Create a noise array
+cv2.randn(noise, mean, stddev)  # Fill the noise array with random values
+
+# Add noise to the grayscale image (clip to valid range)
+noisy_image = cv2.add(gray_image, noise, dtype=cv2.CV_8U)
+
+# Function to display images using matplotlib
+def show_image(img, title):
+    plt.imshow(img, cmap='gray')  # Use 'gray' colormap for grayscale images
+    plt.title(title)
+    plt.axis('off')  # Hide axes
+    plt.show()
+
+# Display original grayscale image
+print("Original Grayscale Image:")
+show_image(gray_image, "Original Grayscale Image")
+
+# Display noisy image
+print("Noisy Image:")
+show_image(noisy_image, "Noisy Image")

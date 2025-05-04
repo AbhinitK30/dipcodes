@@ -1,0 +1,208 @@
+Exp No.2:
+
+a.)
+import cv2
+import matplotlib.pyplot as plt
+
+# Manually provide the image path here
+image_path = 'TG1.bmp'  # <-- Change this to your image file path
+
+# Load the image in grayscale
+image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+# Check if the image loaded successfully
+if image is None:
+    print(f"Error: Could not load image from {image_path}. Please check the file.")
+else:
+    # Create the negative of the image
+    negative_image = 255 - image
+
+    # Function to display images using matplotlib
+    def show_image(img, title):
+        plt.imshow(img, cmap='gray')  # Use 'gray' colormap for grayscale images
+        plt.title(title)
+        plt.axis('off')  # Hide axes
+        plt.show()
+
+    print("Original Grayscale Image:")
+    show_image(image, "Original Grayscale Image")
+
+    print("Negative Image:")
+    show_image(negative_image, "Negative Image")
+
+b.)
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Manually provide the image path here
+image_path = 'TG1.bmp'  # <-- Change this to your image file path
+
+# Read the image in grayscale
+image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+# Check if the image loaded successfully
+if image is None:
+    print(f"Error: Could not load image from {image_path}. Please check the file.")
+else:
+    # Convert to float to avoid overflow in log
+    image = image.astype(np.float32)
+
+    # Apply log transformation: s = c * log(1 + r)
+    c = 255 / np.log(1 + np.max(image))
+    log_transformed = c * np.log(1 + image)
+
+    # Convert back to 8-bit unsigned int
+    log_transformed = np.array(log_transformed, dtype=np.uint8)
+
+    # Function to display images using matplotlib
+    def show_image(img, title):
+        plt.imshow(img, cmap='gray')  # Use 'gray' colormap for grayscale images
+        plt.title(title)
+        plt.axis('off')  # Hide axes
+        plt.show()
+
+    # Display the original grayscale image
+    print("Original Grayscale Image:")
+    show_image(image, "Original Grayscale Image")
+
+    # Display the log-transformed image
+    print("Log Transformed Image:")
+    show_image(log_transformed, "Log Transformed Image")
+
+c.)
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Manually provide the image path here
+image_path = 'TG1.bmp'  # <-- Change this to your image file path
+
+# Read the image in grayscale
+image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+# Check if the image loaded successfully
+if image is None:
+    print(f"Error: Could not load image from {image_path}. Please check the file.")
+else:
+    # Apply Gamma Correction (Power-Law Transformation)
+    gamma = 0.5
+    c = 255 / (np.max(image) ** gamma)  # Normalization constant
+
+    # Apply the transformation
+    gamma_transformed = c * (image ** gamma)
+
+    # Clip the values to be in the valid range [0, 255]
+    gamma_transformed = np.array(gamma_transformed, dtype=np.uint8)
+
+    # Function to display images using matplotlib
+    def show_image(img, title):
+        plt.imshow(img, cmap='gray')  # Use 'gray' colormap for grayscale images
+        plt.title(title)
+        plt.axis('off')  # Hide axes
+        plt.show()
+
+    # Display the original grayscale image
+    print("Original Grayscale Image:")
+    show_image(image, "Original Grayscale Image")
+
+    # Display the gamma-transformed image
+    print(f"Gamma Transformed Image (Gamma={gamma}):")
+    show_image(gamma_transformed, f"Gamma Transformed Image (Gamma={gamma})")
+
+d.)
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Manually provide the image path here
+image_path = 'TG1.bmp'  # <-- Change this to your image file path
+
+# Read the image
+image = cv2.imread(image_path)
+
+# Check if the image loaded successfully
+if image is None:
+    print(f"Error: Could not load image from {image_path}. Please check the file.")
+else:
+    # Horizontal Flip
+    horizontal_flip = cv2.flip(image, 1)
+
+    # Vertical Flip
+    vertical_flip = cv2.flip(image, 0)
+
+    # Both Horizontal and Vertical Flip
+    both_flip = cv2.flip(image, -1)
+
+    # Function to display images using matplotlib
+    def show_image(img, title):
+        plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))  # Convert BGR to RGB
+        plt.title(title)
+        plt.axis('off')  # Hide axes
+        plt.show()
+
+    # Display the flipped images
+    print("Horizontal Flip:")
+    show_image(horizontal_flip, "Horizontal Flip")
+
+    print("Vertical Flip:")
+    show_image(vertical_flip, "Vertical Flip")
+
+    print("Both Horizontal and Vertical Flip:")
+    show_image(both_flip, "Both Horizontal and Vertical Flip")
+
+// w/o inbuilt function
+
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Manually provide the image path here
+image_path = 'TG1.bmp'  # <-- Change this to your image file path
+
+# Read the image
+image = cv2.imread(image_path)
+
+# Check if the image loaded successfully
+if image is None:
+    print(f"Error: Could not load image from {image_path}. Please check the file.")
+else:
+    # Manual Horizontal Flip (left-right flip)
+    height, width, _ = image.shape
+    horizontal_flip = np.zeros_like(image)  # Create an empty image with the same shape as the original
+    
+    for i in range(height):
+        for j in range(width):
+            horizontal_flip[i, j] = image[i, width - 1 - j]  # Swap the columns
+
+    # Manual Vertical Flip (up-down flip)
+    vertical_flip = np.zeros_like(image)  # Create an empty image with the same shape as the original
+    
+    for i in range(height):
+        for j in range(width):
+            vertical_flip[i, j] = image[height - 1 - i, j]  # Swap the rows
+
+    # Manual Both Horizontal and Vertical Flip
+    both_flip = np.zeros_like(image)  # Create an empty image with the same shape as the original
+    
+    for i in range(height):
+        for j in range(width):
+            both_flip[i, j] = image[height - 1 - i, width - 1 - j]  # Swap both rows and columns
+
+    # Function to display images using matplotlib
+    def show_image(img, title):
+        plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))  # Convert BGR to RGB
+        plt.title(title)
+        plt.axis('off')  # Hide axes
+        plt.show()
+
+    # Display the flipped images
+    print("Horizontal Flip:")
+    show_image(horizontal_flip, "Horizontal Flip")
+
+    print("Vertical Flip:")
+    show_image(vertical_flip, "Vertical Flip")
+
+    print("Both Horizontal and Vertical Flip:")
+    show_image(both_flip, "Both Horizontal and Vertical Flip")
+

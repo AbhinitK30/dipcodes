@@ -1,0 +1,52 @@
+Exp No.7:
+
+a.)
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+image_path = 'TE1.bmp'  # Replace with actual path
+image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+if image is None:
+  print("Error: Image not loaded. Please check the image path.")
+  exit()
+def convolution2d(image, kernel):
+  image_height, image_width = image.shape
+  kernel_height, kernel_width = kernel.shape
+  pad_height = kernel_height // 2
+  pad_width = kernel_width // 2
+  padded_image = np.pad(image, ((pad_height, pad_height), (pad_width, pad_width)), mode='constant', constant_values=0)
+  output_image = np.zeros_like(image, dtype=np.float32)
+  for i in range(image_height):
+    for j in range(image_width):
+      region = padded_image[i:i+kernel_height, j:j+kernel_width]
+      output_image[i, j] = np.sum(region * kernel)
+  return output_image
+kernel_roberts_x = np.array([[1, 0], [0, -1]], dtype=np.float32)
+kernel_roberts_y = np.array([[0, 1], [-1, 0]], dtype=np.float32)
+edges_roberts_x = convolution2d(image, kernel_roberts_x)
+edges_roberts_y = convolution2d(image, kernel_roberts_y)
+edges_roberts = np.sqrt(edges_roberts_x**2 + edges_roberts_y**2)
+kernel_prewitt_x = np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]], dtype=np.float32)
+kernel_prewitt_y = np.array([[-1, -1, -1], [0, 0, 0], [1, 1, 1]], dtype=np.float32)
+edges_prewitt_x = convolution2d(image, kernel_prewitt_x)
+edges_prewitt_y = convolution2d(image, kernel_prewitt_y)
+edges_prewitt = np.sqrt(edges_prewitt_x**2 + edges_prewitt_y**2)
+kernel_sobel_x = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]], dtype=np.float32)
+kernel_sobel_y = np.array([[-1, -2, -1], [0, 0, 0], [1, 2, 1]], dtype=np.float32)
+edges_sobel_x = convolution2d(image, kernel_sobel_x)
+edges_sobel_y = convolution2d(image, kernel_sobel_y)
+edges_sobel = np.sqrt(edges_sobel_x**2 + edges_sobel_y**2)
+plt.figure(figsize=(12, 8))
+plt.subplot(1, 4, 1)
+plt.title('Original Image')
+plt.imshow(image, cmap='gray')
+plt.subplot(1, 4, 2)
+plt.title("Robert's Operator")
+plt.imshow(edges_roberts, cmap='gray')
+plt.subplot(1, 4, 3)
+plt.title("Prewitt Operator")
+plt.imshow(edges_prewitt, cmap='gray')
+plt.subplot(1, 4, 4)
+plt.title("Sobel Operator")
+plt.imshow(edges_sobel, cmap='gray')
+plt.show()

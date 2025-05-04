@@ -1,0 +1,250 @@
+Exp No.4:
+
+a.)
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+# List the 4 image paths here
+image_paths = [
+    'hist4.bmp',
+    'hist5.bmp',
+    'hist6.bmp',
+    'hist7.bmp'
+]
+
+for image_path in image_paths:
+    # Read the image in grayscale
+    image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+    if image is None:
+        print(f"❌ Could not read image: {image_path}")
+        continue
+
+    # Compute histogram
+    hist = cv2.calcHist([image], [0], None, [256], [0, 256])
+
+    # Compute brightness and contrast
+    brightness = np.mean(image)
+    contrast = image.std()
+
+    # Classification
+    if brightness < 85:
+        category = "Dark Image"
+    elif brightness > 170:
+        category = "Light Image"
+    elif contrast < 40:
+        category = "Low Contrast Image"
+    else:
+        category = "High Contrast Image"
+
+    # Display image and histogram
+    plt.figure(figsize=(12, 5))
+    
+    plt.subplot(1, 2, 1)
+    plt.imshow(image, cmap='gray')
+    plt.title(f"Grayscale Image: {image_path.split('/')[-1]}")
+    plt.axis("off")
+
+    plt.subplot(1, 2, 2)
+    plt.plot(hist, color='black')
+    plt.title("Histogram")
+    plt.xlabel("Pixel Value")
+    plt.ylabel("Frequency")
+    
+    plt.tight_layout()
+    plt.show()
+
+    # Display classification info
+    print(f"🖼️ Image: {image_path.split('/')[-1]}")
+    print(f"🔆 Brightness: {brightness:.2f}")
+    print(f"🎚️ Contrast: {contrast:.2f}")
+    print(f"🧠 Image Classification: {category}\n")
+
+// w/o inbuilt function
+
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+# List the 4 image paths here
+image_paths = [
+    'hist4.bmp',
+    'hist5.bmp',
+    'hist6.bmp',
+    'hist7.bmp'
+]
+
+for image_path in image_paths:
+    # Read the image in grayscale
+    image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+    if image is None:
+        print(f"❌ Could not read image: {image_path}")
+        continue
+
+    # Create an array to hold the histogram values (256 bins for pixel values 0 to 255)
+    hist = np.zeros(256, dtype=int)
+
+    # Calculate histogram manually by counting occurrences of each pixel value
+    height, width = image.shape
+    for i in range(height):
+        for j in range(width):
+            pixel_value = image[i, j]
+            hist[pixel_value] += 1
+
+    # Compute brightness and contrast
+    brightness = np.mean(image)
+    contrast = image.std()
+
+    # Classification based on brightness and contrast
+    if brightness < 85:
+        category = "Dark Image"
+    elif brightness > 170:
+        category = "Light Image"
+    elif contrast < 40:
+        category = "Low Contrast Image"
+    else:
+        category = "High Contrast Image"
+
+    # Display image and histogram
+    plt.figure(figsize=(12, 5))
+    
+    plt.subplot(1, 2, 1)
+    plt.imshow(image, cmap='gray')
+    plt.title(f"Grayscale Image: {image_path.split('/')[-1]}")
+    plt.axis("off")
+
+    plt.subplot(1, 2, 2)
+    plt.plot(hist, color='black')
+    plt.title("Histogram")
+    plt.xlabel("Pixel Value")
+    plt.ylabel("Frequency")
+    
+    plt.tight_layout()
+    plt.show()
+
+    # Display classification info
+    print(f"🖼️ Image: {image_path.split('/')[-1]}")
+    print(f"🔆 Brightness: {brightness:.2f}")
+    print(f"🎚️ Contrast: {contrast:.2f}")
+    print(f"🧠 Image Classification: {category}\n")
+
+b.)
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Provide the path to your low contrast image here
+image_path = 'hist7.bmp'
+
+# Read the image in grayscale
+image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+# Check if image is read correctly
+if image is None:
+    print(f"❌ Failed to read the image at: {image_path}")
+else:
+    # Compute histogram before equalization
+    hist_before = cv2.calcHist([image], [0], None, [256], [0, 256])
+
+    # Apply Histogram Equalization
+    equalized_image = cv2.equalizeHist(image)
+
+    # Compute histogram after equalization
+    hist_after = cv2.calcHist([equalized_image], [0], None, [256], [0, 256])
+
+    # Plot the results
+    plt.figure(figsize=(12, 8))
+
+    # Original Image and Histogram
+    plt.subplot(2, 2, 1)
+    plt.imshow(image, cmap='gray')
+    plt.title("Original Low Contrast Image")
+    plt.axis("off")
+
+    plt.subplot(2, 2, 2)
+    plt.plot(hist_before, color='black')
+    plt.title("Histogram Before Equalization")
+    plt.xlabel("Pixel Value")
+    plt.ylabel("Frequency")
+
+    # Equalized Image and Histogram
+    plt.subplot(2, 2, 3)
+    plt.imshow(equalized_image, cmap='gray')
+    plt.title("Equalized Image (Enhanced Contrast)")
+    plt.axis("off")
+
+    plt.subplot(2, 2, 4)
+    plt.plot(hist_after, color='black')
+    plt.title("Histogram After Equalization")
+    plt.xlabel("Pixel Value")
+    plt.ylabel("Frequency")
+
+    plt.tight_layout()
+    plt.show()
+
+// w/o inbuilt function
+
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Provide the path to your low contrast image here
+image_path = 'hist7.bmp'
+
+# Read the image in grayscale
+image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+# Check if image is read correctly
+if image is None:
+    print(f"❌ Failed to read the image at: {image_path}")
+else:
+    # Manually compute the histogram before equalization
+    hist_before = np.zeros(256, dtype=int)
+    for pixel_value in image.ravel():
+        hist_before[pixel_value] += 1
+
+    # Apply Histogram Equalization manually (using cv2's built-in function as a reference)
+    # Get the cumulative distribution function (CDF)
+    cdf = hist_before.cumsum()
+    cdf_normalized = cdf * float(hist_before.max()) / cdf.max()  # Normalize CDF
+
+    # Apply the equalization to the image using the CDF
+    equalized_image = np.interp(image.ravel(), np.arange(256), cdf_normalized).reshape(image.shape).astype(np.uint8)
+
+    # Manually compute the histogram after equalization
+    hist_after = np.zeros(256, dtype=int)
+    for pixel_value in equalized_image.ravel():
+        hist_after[pixel_value] += 1
+
+    # Plot the results
+    plt.figure(figsize=(12, 8))
+
+    # Original Image and Histogram
+    plt.subplot(2, 2, 1)
+    plt.imshow(image, cmap='gray')
+    plt.title("Original Low Contrast Image")
+    plt.axis("off")
+
+    plt.subplot(2, 2, 2)
+    plt.plot(hist_before, color='black')
+    plt.title("Histogram Before Equalization")
+    plt.xlabel("Pixel Value")
+    plt.ylabel("Frequency")
+
+    # Equalized Image and Histogram
+    plt.subplot(2, 2, 3)
+    plt.imshow(equalized_image, cmap='gray')
+    plt.title("Equalized Image (Enhanced Contrast)")
+    plt.axis("off")
+
+    plt.subplot(2, 2, 4)
+    plt.plot(hist_after, color='black')
+    plt.title("Histogram After Equalization")
+    plt.xlabel("Pixel Value")
+    plt.ylabel("Frequency")
+
+    plt.tight_layout()
+    plt.show()
+

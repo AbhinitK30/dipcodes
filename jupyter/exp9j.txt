@@ -1,0 +1,174 @@
+Exp No.9:
+
+a.)
+from collections import Counter
+class NodeTree(object):
+  def __init__(self, left=None, right=None):
+    self.left = left
+    self.right = right
+  def children(self):
+    return self.left, self.right
+  def __str__(self):
+    return str(self.left) + ' ' + str(self.right)
+def huffman_code_tree(node, binString=''):
+  '''
+  Function to find Huffman Code encoding in a dictionary representation
+  '''
+  if type(node) is str:
+    return {node:binString}#binstring either appends 0 or 1
+  #based on where the child node goes
+  (l, r) = node.children()
+  d = dict()
+  d.update(huffman_code_tree(l, binString + '1'))
+  d.update(huffman_code_tree(r, binString + '0'))
+  return d
+def make_tree(nodes):
+  '''
+  Function to make tree
+  :param nodes: Nodes
+  :return: Root of the tree
+  '''
+  while len(nodes) > 1: #perform the process of taking the smallest tree nodes,
+  #taking their sum and forming them to be a larger node until we reach the
+  #root node
+    (key1, c1) = nodes[-1]
+    (key2, c2) = nodes[-2]
+    nodes = nodes[:-2]
+    node = NodeTree(key1, key2)
+    nodes.append((node, c1 + c2))
+    nodes = sorted(nodes, key=lambda x: x[1], reverse=True)
+  return nodes[0][0]
+if __name__ == '__main__':
+  string = ''
+  matrix = [[3, 3, 3, 2], [2, 3, 3, 3], [3, 2, 2, 2], [2, 1, 1, 0]]
+  # total_pixels = len(matrix) * len(matrix[0])
+  total_pixels = len(matrix) * len(matrix[0])
+  freq = dict(Counter([str(pixel) for row in matrix for pixel in row]))
+  print(freq)
+  probability = {}
+  bit_length = []
+  mean_bits_per_pixel = 0
+  for pixel in freq:
+    probability[pixel] = freq[pixel] / total_pixels
+  print(probability)
+  nodes = [(k, v) for k, v in probability.items()]
+  nodes = sorted(nodes, key=lambda x: x[1], reverse=True)
+  node = make_tree(nodes)
+  encoding = huffman_code_tree(node)
+  print(encoding)
+  sum = 0
+  for i in encoding:
+    bit_length = len(encoding[i])
+    sum += bit_length * probability[i]
+    print(f'{i} : {encoding[i]}')
+  img_size_before_compression = 2
+  compression_ratio = img_size_before_compression / sum
+  print('compression_ratio:', compression_ratio)
+  from collections import Counter
+matrix = [[3, 3, 3, 2], [2, 3, 3, 3], [3, 2, 2, 2], [2, 1, 1, 0]]
+#total_pixels = len(matrix) * len(matrix[0])
+# freq = dict(Counter([str(pixel) for row in matrix for pixel in row]))
+matrix_tuple = [str(pixel) for inner in matrix for pixel in inner]
+freq = dict(Counter(matrix_tuple))
+print(freq)
+
+b.)
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+from collections import Counter
+
+# Huffman Tree Node Class
+class NodeTree:
+    def __init__(self, value=None, left=None, right=None):
+        self.value = value
+        self.left = left
+        self.right = right
+
+    def children(self):
+        return self.left, self.right
+
+# Huffman Encoding Function
+def huffman_code_tree(node, binString=''):
+    if isinstance(node, NodeTree) and node.value is not None:
+        return {node.value: binString}
+
+    (l, r) = node.children()
+    d = dict()
+    d.update(huffman_code_tree(l, binString + '1'))
+    d.update(huffman_code_tree(r, binString + '0'))
+    return d
+
+# Build Huffman Tree
+def make_tree(nodes):
+    while len(nodes) > 1:
+        (key1, c1) = nodes[-1]
+        (key2, c2) = nodes[-2]
+        nodes = nodes[:-2]
+        node = NodeTree(None, key1, key2)
+        nodes.append((node, c1 + c2))
+        nodes = sorted(nodes, key=lambda x: x[1], reverse=True)
+    return nodes[0][0]
+
+# Function to Apply Huffman Encoding on an Image
+def apply_huffman_to_image():
+    image_path = 'TE1.bmp'  # Replace with actual path
+
+    # Read as grayscale image
+    image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+    if image is None:
+        print("Error: Unable to read the image.")
+        return
+
+    total_pixels = image.size
+    pixel_values = image.flatten()
+
+    freq = dict(Counter(pixel_values))
+    # Compute probability of pixel values
+    probability = {k: v / total_pixels for k, v in freq.items()}
+
+    # Create Huffman nodes sorted by frequency
+    nodes = sorted([(NodeTree(k), v) for k, v in probability.items()], key=lambda x: x[1], reverse=True)
+
+    # Build Huffman Tree
+    node = make_tree(nodes)
+
+    # Generate Huffman encoding table
+    encoding = huffman_code_tree(node)
+
+    # Encode Image using Huffman Codes
+    encoded_image = np.vectorize(lambda x: len(encoding[x]))(image) # Use code length as intensity
+
+    # Display Original Image
+    plt.figure(figsize=(10, 5))
+    plt.subplot(1, 2, 1)
+    plt.imshow(image, cmap='gray')
+    plt.title("Original Image")
+    plt.axis("off")
+
+    # Display Huffman Encoded Image Representation
+    plt.subplot(1, 2, 2)
+    plt.imshow(encoded_image, cmap='gray') # Encode with code length for visualization
+    plt.title("Huffman Encoded Image")
+    plt.axis("off")
+
+    plt.show()
+
+# Run Huffman Encoding
+apply_huffman_to_image()
+
+c.)
+# Compute total bits used after Huffman Encoding
+total_bits_used = 0
+
+for pixel in freq:
+  total_bits_used += len(encoding[pixel]) * freq[pixel]
+
+# Compute original image size (assuming 8 bits per pixel in grayscale image)
+original_bits = total_pixels * 8
+
+# Compute compression ratio
+compression_ratio = original_bits / total_bits_used
+
+# Display compression ratio
+print(f"Compression Ratio: {compression_ratio:.2f}")

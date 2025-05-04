@@ -1,0 +1,335 @@
+Exp No.5:
+
+a.)
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Provide the path to your image here
+image_path = 'averaging_filter.bmp'
+
+# Read the image in grayscale
+image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+# Check if image is read correctly
+if image is None:
+    print(f"❌ Could not read the image at: {image_path}")
+else:
+    # Apply Box Filter (Mean Filter) with 3×3 and 7×7 kernels
+    box_3x3 = cv2.blur(image, (3, 3))
+    box_7x7 = cv2.blur(image, (7, 7))
+
+    # Display the original and filtered images
+    plt.figure(figsize=(15, 5))
+
+    plt.subplot(1, 3, 1)
+    plt.imshow(image, cmap='gray')
+    plt.title("Original Image")
+    plt.xlabel("Width")
+    plt.ylabel("Height")
+
+    plt.subplot(1, 3, 2)
+    plt.imshow(box_3x3, cmap='gray')
+    plt.title("Box Filter (3×3)")
+    plt.xlabel("Width")
+    plt.ylabel("Height")
+
+    plt.subplot(1, 3, 3)
+    plt.imshow(box_7x7, cmap='gray')
+    plt.title("Box Filter (7×7)")
+    plt.xlabel("Width")
+    plt.ylabel("Height")
+
+    plt.tight_layout()
+    plt.show()
+
+// w/o inbuilt function
+
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Provide the path to your image here
+image_path = 'averaging_filter.bmp'
+
+# Read the image in grayscale
+image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+# Check if the image is read correctly
+if image is None:
+    print(f"❌ Could not read the image at: {image_path}")
+else:
+    # Function to apply a mean filter (Box filter) manually
+    def apply_mean_filter(image, kernel_size):
+        # Get the height and width of the image
+        height, width = image.shape
+        
+        # Pad the image to handle borders (pad with zeros)
+        pad_size = kernel_size // 2
+        padded_image = np.pad(image, pad_size, mode='constant', constant_values=0)
+        
+        # Create an empty output image
+        output_image = np.zeros_like(image)
+        
+        # Apply the mean filter (convolution)
+        for i in range(height):
+            for j in range(width):
+                # Extract the region of interest (ROI) around the current pixel
+                roi = padded_image[i:i+kernel_size, j:j+kernel_size]
+                
+                # Compute the mean of the ROI and assign it to the output image
+                output_image[i, j] = np.mean(roi)
+        
+        return output_image
+
+    # Apply Box Filter (3x3) and Box Filter (7x7) manually
+    box_3x3_manual = apply_mean_filter(image, 3)
+    box_7x7_manual = apply_mean_filter(image, 7)
+
+    # Display the original and filtered images
+    plt.figure(figsize=(15, 5))
+
+    # Original Image
+    plt.subplot(1, 3, 1)
+    plt.imshow(image, cmap='gray')
+    plt.title("Original Image")
+    plt.xlabel("Width")
+    plt.ylabel("Height")
+
+    # Box Filter (3x3) manually
+    plt.subplot(1, 3, 2)
+    plt.imshow(box_3x3_manual, cmap='gray')
+    plt.title("Box Filter (3x3) Manual")
+    plt.xlabel("Width")
+    plt.ylabel("Height")
+
+    # Box Filter (7x7) manually
+    plt.subplot(1, 3, 3)
+    plt.imshow(box_7x7_manual, cmap='gray')
+    plt.title("Box Filter (7x7) Manual")
+    plt.xlabel("Width")
+    plt.ylabel("Height")
+
+    plt.tight_layout()
+    plt.show()
+
+b.)
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Path to the input image
+image_path = 'averaging_filter.bmp'  # <-- Replace this with your image path
+
+# Read the image in grayscale
+image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+# Check if the image was read successfully
+if image is None:
+    print(f"❌ Could not read the image at: {image_path}")
+else:
+    # Function to add Gaussian noise
+    def add_gaussian_noise(image, mean=0, sigma=25):
+        noise = np.random.normal(mean, sigma, image.shape).astype(np.int16)
+        noisy_image = image.astype(np.int16) + noise
+        noisy_image = np.clip(noisy_image, 0, 255).astype(np.uint8)
+        return noisy_image
+
+    # Add Gaussian noise
+    noisy_image = add_gaussian_noise(image)
+
+    # Apply Box Filter (Mean Filter) with 3×3 and 7×7 kernels
+    box_3x3 = cv2.blur(noisy_image, (3, 3))
+    box_7x7 = cv2.blur(noisy_image, (7, 7))
+
+    # Display all images
+    plt.figure(figsize=(15, 8))
+
+    plt.subplot(2, 2, 1)
+    plt.imshow(image, cmap='gray')
+    plt.title("Original Image")
+    plt.xlabel("Width")
+    plt.ylabel("Height")
+
+    plt.subplot(2, 2, 2)
+    plt.imshow(noisy_image, cmap='gray')
+    plt.title("Noisy Image (Gaussian Noise)")
+    plt.xlabel("Width")
+    plt.ylabel("Height")
+
+    plt.subplot(2, 2, 3)
+    plt.imshow(box_3x3, cmap='gray')
+    plt.title("Box Filter (3×3)")
+    plt.xlabel("Width")
+    plt.ylabel("Height")
+
+    plt.subplot(2, 2, 4)
+    plt.imshow(box_7x7, cmap='gray')
+    plt.title("Box Filter (7×7)")
+    plt.xlabel("Width")
+    plt.ylabel("Height")
+
+    plt.tight_layout()
+    plt.show()
+
+// similar to prev
+
+c.)
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Path to the input image
+image_path = 'averaging_filter.bmp'  # <-- Replace this with the path to your image
+
+# Read the image in grayscale
+image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+# Check if the image was read correctly
+if image is None:
+    print(f"❌ Error: Could not load the image from '{image_path}'")
+else:
+    # Apply Median Filtering with 3×3 and 7×7 kernels
+    median_3x3 = cv2.medianBlur(image, 3)
+    median_7x7 = cv2.medianBlur(image, 7)
+
+    # Display the original and filtered images
+    plt.figure(figsize=(15, 5))
+
+    plt.subplot(1, 3, 1)
+    plt.imshow(image, cmap='gray')
+    plt.title("Original Image")
+    plt.xlabel("Width")
+    plt.ylabel("Height")
+
+    plt.subplot(1, 3, 2)
+    plt.imshow(median_3x3, cmap='gray')
+    plt.title("Median Filter (3×3)")
+    plt.xlabel("Width")
+    plt.ylabel("Height")
+
+    plt.subplot(1, 3, 3)
+    plt.imshow(median_7x7, cmap='gray')
+    plt.title("Median Filter (7×7)")
+    plt.xlabel("Width")
+    plt.ylabel("Height")
+
+    plt.tight_layout()
+    plt.show()
+
+// w/o inbuilt function
+
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Path to the input image
+image_path = 'averaging_filter.bmp'  # <-- Replace this with the path to your image
+
+# Read the image in grayscale
+image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+# Check if the image was read correctly
+if image is None:
+    print(f"❌ Error: Could not load the image from '{image_path}'")
+else:
+    # Function to apply median filter manually
+    def apply_median_filter(image, kernel_size):
+        # Get the height and width of the image
+        height, width = image.shape
+        
+        # Pad the image to handle borders (pad with zeros)
+        pad_size = kernel_size // 2
+        padded_image = np.pad(image, pad_size, mode='constant', constant_values=0)
+        
+        # Create an empty output image
+        output_image = np.zeros_like(image)
+        
+        # Apply the median filter (convolution)
+        for i in range(height):
+            for j in range(width):
+                # Extract the region of interest (ROI) around the current pixel
+                roi = padded_image[i:i+kernel_size, j:j+kernel_size]
+                
+                # Compute the median of the ROI and assign it to the output image
+                output_image[i, j] = np.median(roi)
+        
+        return output_image
+
+    # Apply Median Filter (3x3) and Median Filter (7x7) manually
+    median_3x3_manual = apply_median_filter(image, 3)
+    median_7x7_manual = apply_median_filter(image, 7)
+
+    # Display the original and filtered images
+    plt.figure(figsize=(15, 5))
+
+    # Original Image
+    plt.subplot(1, 3, 1)
+    plt.imshow(image, cmap='gray')
+    plt.title("Original Image")
+    plt.xlabel("Width")
+    plt.ylabel("Height")
+
+    # Median Filter (3x3) manually
+    plt.subplot(1, 3, 2)
+    plt.imshow(median_3x3_manual, cmap='gray')
+    plt.title("Median Filter (3x3) Manual")
+    plt.xlabel("Width")
+    plt.ylabel("Height")
+
+    # Median Filter (7x7) manually
+    plt.subplot(1, 3, 3)
+    plt.imshow(median_7x7_manual, cmap='gray')
+    plt.title("Median Filter (7x7) Manual")
+    plt.xlabel("Width")
+    plt.ylabel("Height")
+
+    plt.tight_layout()
+    plt.show()
+
+d.)
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Provide the path to your noisy image
+image_path = 'median.bmp'  # <-- Replace with your actual image path
+
+# Read the image in grayscale
+image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+# Check if image loaded successfully
+if image is None:
+    print(f"❌ Error: Unable to load image from '{image_path}'")
+else:
+    # Apply Median Filtering with 3×3 kernel
+    median_filtered = cv2.medianBlur(image, 3)
+
+    # Apply Averaging (Box) Filtering with 3×3 kernel
+    avg_filtered = cv2.blur(image, (3, 3))
+
+    # Display the original and filtered images
+    plt.figure(figsize=(15, 5))
+
+    plt.subplot(1, 3, 1)
+    plt.imshow(image, cmap='gray')
+    plt.title("Original Image (With Salt-and-Pepper Noise)")
+    plt.xlabel("Width")
+    plt.ylabel("Height")
+
+    plt.subplot(1, 3, 2)
+    plt.imshow(median_filtered, cmap='gray')
+    plt.title("Median Filter (3×3) - Noise Removed")
+    plt.xlabel("Width")
+    plt.ylabel("Height")
+
+    plt.subplot(1, 3, 3)
+    plt.imshow(avg_filtered, cmap='gray')
+    plt.title("Averaging Filter (3×3) - Blurred")
+    plt.xlabel("Width")
+    plt.ylabel("Height")
+
+    plt.tight_layout()
+    plt.show()
+
+// combination of prev you know
